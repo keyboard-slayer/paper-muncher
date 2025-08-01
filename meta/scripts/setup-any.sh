@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
-if [ "$EUID" -eq 0 ]; then
+if [ "$(id -u)" -eq 0 ]; then
     export CUTEKIT_ELEVATOR=""
 elif [ -x "$(command -v sudo)" ]; then
     export CUTEKIT_ELEVATOR="sudo"
@@ -11,7 +11,7 @@ elif [ -x "$(command -v doas)" ]; then
 fi
 
 
-function is_ubuntu() {
+is_ubuntu() {
     if [ -f /etc/os-release ]; then
         grep -q "ubuntu" /etc/os-release
         return $?
@@ -19,7 +19,7 @@ function is_ubuntu() {
     return 1
 }
 
-function is_debian() {
+is_debian() {
     if [ -f /etc/os-release ]; then
         grep -q "debian" /etc/os-release
         return $?
@@ -27,17 +27,24 @@ function is_debian() {
     return 1
 }
 
-function is_darwin() {
+is_darwin() {
     if [ "$(uname)" == "Darwin" ]; then
         return 0
     fi
     return 1
 }
 
-function is_arch() {
+is_arch() {
     if [ -f /etc/os-release ]; then
         grep -q "Arch Linux" /etc/os-release
         return $?
+    fi
+    return 1
+}
+
+is_freebsd() {
+    if [ "$(uname)" == "FreeBSD" ]; then
+        return 0
     fi
     return 1
 }
@@ -51,6 +58,8 @@ if [ "$1" == "tools" -a "$2" == "setup" ]; then
         $CUTEKIT_ELEVATOR ./meta/scripts/setup-arch.sh
     elif is_darwin; then
         ./meta/scripts/setup-darwin.sh
+    elif is_freebsd; then
+        $CUTEKIT_ELEVATOR ./meta/scripts/setup-freebsd.sh
     fi
     if [ ! -x "$(command -v uv)" ]; then
         curl -LsSf https://astral.sh/uv/install.sh | sh
