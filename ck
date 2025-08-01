@@ -1,8 +1,8 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 set -e
 
-if [ "$EUID" -eq 0 ]; then
+if [ "$(id -u)" -eq 0 ]; then
     echo "Please do not run this script as root."
 
     if [ "$CUTEKIT_ALLOW_ROOT" == "1" ]; then
@@ -14,5 +14,5 @@ if [ "$EUID" -eq 0 ]; then
     fi
 fi
 
-source ./meta/scripts/setup-any.sh
+. ./meta/scripts/setup-any.sh
 meta/scripts/cutekit-wrapper.py $@
